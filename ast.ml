@@ -7,6 +7,7 @@ type bind = typ * string
 
 type expr = 
     Id of string
+  | Order of expr
   | Extr of string * expr 
   | Intlit of int
   | Floatlit of float
@@ -42,7 +43,8 @@ type variabledecl =
   |Primdecl_i of typ * string * expr
   |Arr_poly_decl of typ * string * int
   |Arrdecl_i of typ * string * int * expr list 
-  |Polydecl_i of typ * string * int * expr list 
+  |Polydecl_i of typ * string * int * expr list
+  |Arr_poly_decl_i of typ * string * int * string 
 
 type functiondecl = 
   { 
@@ -103,6 +105,7 @@ let rec string_of_expr = function
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_unop o ^ "(" ^ string_of_expr e ^ ")"
   | Mod(e) -> "|" ^ string_of_expr e ^ "|"
+  | Order(e)->"order(" ^ string_of_expr e ^ ")"
   | Asn(v, e) -> string_of_expr v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
@@ -127,6 +130,7 @@ let string_of_formaldecl = function
 
 let string_of_variabledecl = function
     Primdecl(a,b) -> string_of_typ a ^ " " ^ b ^ ";"
+  | Arr_poly_decl_i(a,b,c,d) -> string_of_typ a ^ " " ^ " [" ^ string_of_int c ^ "]" ^ b ^ " = " ^  d ^ ";"
   | Primdecl_i (a,b,c) -> string_of_typ a ^ " " ^ b ^ " = " ^ string_of_expr c ^ ";"
   | Arr_poly_decl(a,b,c) -> string_of_typ a ^ " [" ^ string_of_int c ^ "]" ^ b ^ ";" 
   | Polydecl_i (a,b,c,d) -> string_of_typ a ^ " [" ^ string_of_int c ^ "]" ^ b ^ " = " ^ "{" ^ String.concat ", " (List.map string_of_expr d) ^ "}" ^ ";"
